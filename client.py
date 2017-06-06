@@ -45,12 +45,13 @@ while True:
 	        # amount_received += len(data)
 	        #print >>sys.stderr, 'received "%s"' % data
 	    except socket.error, exc:
-	        print "except error: %s" % str(exc)
-	        print "caiu a porta: %d" % port+i
+			port += i
+			print "caiu a porta: %d" % port
+			print "except error: %s" % str(exc)
 	        
-	     #   if leader == port:
+	     	#  if leader == port:
 
-	      #  sock.sendall(errorMessage)
+	      	#  sock.sendall(errorMessage)
 
 	    finally:
 	    	#port += 1
