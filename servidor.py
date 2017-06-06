@@ -17,9 +17,9 @@ N = int(sys.argv[2])
 
 # first leader
 if peerId == 0:
-    leader = 1
+        leader = 1
 else:
-    leader = 0
+        leader = 0
 port = peerId + 5000
 
 # Create a TCP/IP socket
@@ -37,59 +37,63 @@ sock.listen(1)
 # create list of active peers
 peerIdList = []
 for i in range(N) :
-        peerIdList.append(0)
+    peerIdList.append(0)
 
 while True:
 
 
-    # Wait for a connection
-    #print >>sys.stderr, '##########SERVAR: waiting for a connection'
-    connection, client_address = sock.accept()
-    try:
-        print >>sys.stderr, 'connection from', client_address
+        # Wait for a connection
+        #print >>sys.stderr, '##########SERVAR: waiting for a connection'
+        connection, client_address = sock.accept()
+        try:
+            print >>sys.stderr, 'connection from', client_address
 
-        # Receive the data in small chunks and retransmit it
-        while True:
-            dataRcvd = connection.recv(32) #data is peerId
-            #print >>sys.stderr, 'peerIdRcvd "%s"' % peerIdRcvd
-            if dataRcvd:
-                peerIdRcvd = int(dataRcvd)
-                print >>sys.stderr, 'Recebido: %d' % peerIdRcvd
-                peerIdList[peerIdRcvd] = 1 # confirm that the peer is
+            # Receive the data in small chunks and retransmit it
+            while True:
+                dataRcvd = connection.recv(32) #data is peerId
+                #print >>sys.stderr, 'peerIdRcvd "%s"' % peerIdRcvd
+                if len(dataRcvd) == 1:
+                    peerIdRcvd = int(dataRcvd)
+                    print >>sys.stderr, 'Recebido: %d' % peerIdRcvd
+                    peerIdList[peerIdRcvd] = 1 # confirm that the peer is
 
-                print peerIdList
+                    print peerIdList
 
 
-                peerIdConcate = ''.join(str(e) for e in peerIdList) #whom
+                    peerIdConcate = ''.join(str(e) for e in peerIdList) #whom
 
-                # j = 0
-                # for j in range(N):
-                #     peerIdConcate += str(peerIdList[i])
-                    
+                    # j = 0
+                    # for j in range(N):
+                    #     peerIdConcate += str(peerIdList[i])
 
-                #print >>sys.stderr, 'PeerIdCocate = ', peerIdConcate
 
-                #send active peers to client
-                print >>sys.stderr, 'Enviando para o cliente a msg: "%s"' % peerIdConcate
-                #print >>sys.stderr, '%s' % peerIdConcate 
-                connection.sendall(peerIdConcate)
-                #connection.sendal
-            else:
-                print >>sys.stderr, '-no data-', client_address
-                break
+                    #print >>sys.stderr, 'PeerIdCocate = ', peerIdConcate
 
-        # verify if this peer is the new leader
-        if leader == 0:
-	        for j in range(N) :
-	            if j == peerId:
-	                lider = 1
-	                print >>sys.stderr, 'eu sou o novo lider [peerId]: %d' % peerId
-	            if peerIdList[j] == 1:
-	                # leader is peerIdList[j]
-	                break
+                    #send active peers to client
+                    print >>sys.stderr, 'Enviando para o cliente a msg: "%s"' % peerIdConcate
+                    #print >>sys.stderr, '%s' % peerIdConcate
+                    connection.sendall(peerIdConcate)
+                    #connection.sendal
+                elif len(dataRcvd) > 1:
+                    print "Recebi um vetor de peerIds aqui no serva"
+                    for (key, val) in enumerate(list(dataRcvd)):
+                        peerIdList[key] = val
+                else:
+                    print >>sys.stderr, '-no data-', client_address
+                    break
 
-                
-            
-    finally:
-        # Clean up the connection
-        connection.close()
+            # verify if this peer is the new leader
+            if leader == 0:
+                for j in range(N) :
+                    if j == peerId:
+                        lider = 1
+                        print >>sys.stderr, 'eu sou o novo lider [peerId]: %d' % peerId
+                    if peerIdList[j] == 1:
+                        # leader is peerIdList[j]
+                        break
+
+
+
+        finally:
+            # Clean up the connection
+            connection.close()

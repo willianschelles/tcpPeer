@@ -52,7 +52,7 @@ while True:
         while True:
             dataRcvd = connection.recv(32) #data is peerId
             #print >>sys.stderr, 'peerIdRcvd "%s"' % peerIdRcvd
-            if dataRcvd:
+            if len(dataRcvd) == 1:
                 peerIdRcvd = int(dataRcvd)
                 print >>sys.stderr, 'Recebido: %d' % peerIdRcvd
                 peerIdList[peerIdRcvd] = 1 # confirm that the peer is
@@ -62,18 +62,15 @@ while True:
 
                 peerIdConcate = ''.join(str(e) for e in peerIdList) #whom
 
-                # j = 0
-                # for j in range(N):
-                #     peerIdConcate += str(peerIdList[i])
-                    
-
-                #print >>sys.stderr, 'PeerIdCocate = ', peerIdConcate
-
-                #send active peers to client
                 print >>sys.stderr, 'Enviando para o cliente a msg: "%s"' % peerIdConcate
-                #print >>sys.stderr, '%s' % peerIdConcate 
+                #print >>sys.stderr, '%s' % peerIdConcate
                 connection.sendall(peerIdConcate)
                 #connection.sendal
+            elif len(dataRcvd) > 1:
+                print "Recebi um vetor de peerIds aqui no serva"
+                for (key, val) in list(dataRcvd):
+                    peerIdList[key] = val
+
             else:
                 print >>sys.stderr, '-no data-', client_address
                 break
@@ -88,8 +85,8 @@ while True:
 	                # leader is peerIdList[j]
 	                break
 
-                
-            
+
+
     finally:
         # Clean up the connection
         connection.close()
