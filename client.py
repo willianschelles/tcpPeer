@@ -11,15 +11,17 @@ print peerId
 N = int(sys.argv[2])
 
 # create list of active peers
+def initializePeerIdList( peerIdList ):
+    for i in range(N) :
+        peerIdList.append(1)
+
+# elect first leader
+def electFirstLeader( ):
+    return 1 if peerId == 0 else 0
+
+leader = electFirstLeader()
 peerIdList = []
-for i in range(N) :
-	peerIdList.append(int(1))
-
-
-if peerId == 0:
-	leader = 1
-else:
-	leader = 0
+initializePeerIdList( peerIdList )
 
 while True:
 	time.sleep(3)
@@ -63,7 +65,7 @@ while True:
 								sock.connect(("localhost", port_to_connect))
 								sock.sendall(peerIdConcate)
 						except socket.error, exc:
-							print "deu temer pro key = %d" % key
+							print "exception: %s" % exc
 
 
 			#  if leader == port:
