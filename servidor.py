@@ -35,11 +35,12 @@ sock.listen(1)
 
 # create list of active peers
 peerIdList = []
+for i in range(N) :
+        peerIdList.append(0)
 
 while True:
 
-    for i in range(N) :
-        peerIdList.append(0)
+
     # Wait for a connection
     print >>sys.stderr, '##########SERVAR: waiting for a connection'
     connection, client_address = sock.accept()
@@ -58,7 +59,7 @@ while True:
                 print peerIdList
 
 
-                peerIdConcate = ''.join(str(e) for e in peerIdList)
+                peerIdConcate = ''.join(str(e) for e in peerIdList) #whom
 
                 # j = 0
                 # for j in range(N):
