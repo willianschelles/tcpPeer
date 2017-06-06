@@ -45,13 +45,12 @@ while True:
 					peerIdList[key] = val
 			except socket.error, exc:
 				down_port = port + i
-				print "caiu a porta: %d" % down_port
-				print "except error: %s" % str(exc)
 				down_peerId = down_port - 5000
 				peerIdList[down_peerId] = 0
-				print 'peerId caido: %d' % down_peerId
+				print "caiu a porta %d referente ao peer de id %d" % (down_port, down_peerId)
+				#print "except error: %s" % str(exc)
 				peerIdConcate = ''.join(str(e) for e in peerIdList) #whom
-				print '=> peerIdList depois de cair: [%s]' % peerIdConcate
+				#print '=> peerIdList depois de cair: [%s]' % peerIdConcate
 
 				#send message to active peers about the connection failure
 				for (key, val) in enumerate(list(peerIdList)):
@@ -60,7 +59,7 @@ while True:
 						try:
 							port_to_connect = key + port
 							if (port_to_connect) != down_port:
-								print 'conectando a porta %d' % port_to_connect
+								#print 'conectando a porta %d' % port_to_connect
 								sock.connect(("localhost", port_to_connect))
 								sock.sendall(peerIdConcate)
 						except socket.error, exc:
@@ -73,5 +72,5 @@ while True:
 
 			finally:
 			#port += 1
-				print >>sys.stderr, 'finallyClient----------'
+				#print >>sys.stderr, 'finallyClient----------'
 				sock.close()

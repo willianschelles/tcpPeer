@@ -42,47 +42,48 @@ for i in range(N) :
 
 while True:
 
+    # Wait for a connection
+    #print >>sys.stderr, '##########SERVAR: waiting for a connection'
+    connection, client_address = sock.accept()
+    try:
+        print >>sys.stderr, 'connection from', client_address
 
-        # Wait for a connection
-        #print >>sys.stderr, '##########SERVAR: waiting for a connection'
-        connection, client_address = sock.accept()
-        try:
-            print >>sys.stderr, 'connection from', client_address
+        # Receive the data in small chunks and retransmit it
+        while True:
+            dataRcvd = connection.recv(32) #data is peerId
+            #print >>sys.stderr, 'peerIdRcvd "%s"' % peerIdRcvd
+            if dataRcvd:
+                
+                
+                #print "Recebi um vetor de peerIds aqui no serva"
+                for (key, val) in enumerate(list(dataRcvd)):
+                    peerIdList[key] = val
 
-            # Receive the data in small chunks and retransmit it
-            while True:
-                dataRcvd = connection.recv(32) #data is peerId
-                #print >>sys.stderr, 'peerIdRcvd "%s"' % peerIdRcvd
-                if dataRcvd:
-                    
-                    print "Recebi um vetor de peerIds aqui no serva"
-                    for (key, val) in enumerate(list(dataRcvd)):
-                        peerIdList[key] = val
-
-                    peerIdConcate = ''.join(str(e) for e in peerIdList) #whom
+                peerIdConcate = ''.join(str(e) for e in peerIdList) #whom
 
 
-                    #send active peers to client
-                    print >>sys.stderr, 'Enviando para o cliente a msg: "%s"' % peerIdConcate
-                    #print >>sys.stderr, '%s' % peerIdConcate
-                    connection.sendall(peerIdConcate)
-                    
-                else:
-                    print >>sys.stderr, '-no data-', client_address
+                #send active peers to client
+                print >>sys.stderr, 'Enviando para o cliente a msg: "%s"' % peerIdConcate
+                #print >>sys.stderr, '%s' % peerIdConcate
+                connection.sendall(peerIdConcate)
+                
+            else:
+                #print >>sys.stderr, '-no data-', client_address
+                break
+
+        # verify if this peer is the new leader
+        if leader == 0:
+            for j in range(N) :
+                if j == peerId:
+                    leader = 1
+                    print >>sys.stderr, 'EU SOU o novo lider [peerId]: %d' % peerId
+                    break
+                elif int(peerIdList[j]) == 1:
+                    print 'Novo lider nao sou eu, eh o [peerId]: %d' % j
+                    # leader is peerIdList[j]
                     break
 
-            # verify if this peer is the new leader
-            print 'CHEGOU A HORA DE VER SE EU SOU O LIDER PQ EU SOU  O LIDER'
-            if leader == 0:
-                for j in range(N) :
-                    if int(peerIdList[j]) == 1:
-                        # leader is peerIdList[j]
-                        break
-                    if j == peerId:
-                        leader = 1
-                        print >>sys.stderr, '########## EU SOU o novo lider [peerId]: %d ##########' % peerId
 
-
-        finally:
-            # Clean up the connection
-            connection.close()
+    finally:
+        # Clean up the connection
+        connection.close()
