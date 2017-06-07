@@ -33,20 +33,36 @@ def initializePeerIdList( peerIdList ):
     for i in range(N) :
         peerIdList.append(1)
 
+strPeerId = str(peerId)
+logFile = "log%s.txt" % strPeerId
+
+# open file, write and close
+def printOnFile( logFileTxT , stringToPrint ):
+    logFileTxT = open(logFile, "a")
+    logFileTxT.write(stringToPrint)
+    logFileTxT.close()
+
+    
 
 #initializing datas
-leader = electFirstLeader()
 port = peerId + 5000
 sock = socket
 sock = initializeSocket( sock )
 peerIdList = []
 initializePeerIdList( peerIdList )
+countConnection = 0
+
+
+#f.write(N)
 
 while True:
 
     # Wait for a connection
     connection, client_address = sock.accept()
     try:
+        stringLog = 'Connection from: %s \n' % client_address 
+        printOnFile(stringLog)
+
         print >>sys.stderr, 'Connection from: ', client_address
         # Receive the data in small chunks and retransmit it
         while True:
@@ -55,7 +71,10 @@ while True:
             if dataRcvd:
                 for (key, val) in enumerate(list(dataRcvd)):
                     peerIdList[key] = val
-
+                countConnection += 1
+                if countConnection == N:
+                    leader = electFirstLeader()
+                    
                 peerIdConcate = ''.join(str(e) for e in peerIdList) #concatenate "string" to list which peer is running
                 print >>sys.stderr, 'Enviando peers ativos para o cliente: "%s"' % peerIdConcate   
                 connection.sendall(peerIdConcate)                   #send active peers to client
@@ -80,3 +99,4 @@ while True:
     finally:
         # Clean up the connection
         connection.close()
+        logFileTxT.close()

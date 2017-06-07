@@ -1,0 +1,8 @@
+CLIENT: Inicia client de peerId 0
+CLIENT: Numero de peers 3
+CLIENT: Eviando msg: "111" to port: 5000
+SERVER: Enviando peers ativos para o cliente: "111"
+CLIENT: caiu a porta 5001 referente ao peer de id 1CLIENT: Conectando a porta 5000SERVER: Enviando peers ativos para o cliente: "101"
+CLIENT: exception: [Errno 106] Transport endpoint is already connectedCLIENT: caiu a porta 5002 referente ao peer de id 2CLIENT: Conectando a porta 5000SERVER: Enviando peers ativos para o cliente: "100"
+CLIENT: Eviando msg: "100" to port: 5000
+SERVER: Enviando peers ativos para o cliente: "100"

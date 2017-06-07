@@ -50,6 +50,9 @@ while True:
 				down_peerId = down_port - 5000
 				peerIdList[down_peerId] = 0
 				print "caiu a porta %d referente ao peer de id %d" % (down_port, down_peerId)
+				#if current peerId, equal peerId disconnected, stop application
+				if peerId == down_peerId :
+					sys.exit()
 				#print "except error: %s" % str(exc)
 				peerIdConcate = ''.join(str(e) for e in peerIdList) #whom
 				#print '=> peerIdList depois de cair: [%s]' % peerIdConcate
@@ -63,6 +66,7 @@ while True:
 							if (port_to_connect) != down_port:
 								#print 'conectando a porta %d' % port_to_connect
 								sock.connect(("localhost", port_to_connect))
+								# notify other peers about new leader
 								sock.sendall(peerIdConcate)
 						except socket.error, exc:
 							print "exception: %s" % exc

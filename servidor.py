@@ -3,14 +3,8 @@ import sys
 
 print(sys.argv)
 
-# current peer ID
 peerId = int(sys.argv[1])
-print >>sys.stderr, 'Eu sou o server %d ' % peerId
-
-# number of peers
 N = int(sys.argv[2])
-print >>sys.stderr, 'Numero de peers %d ' % N
-
 
 # elect first leader
 def electFirstLeader( ):
@@ -33,14 +27,41 @@ def initializePeerIdList( peerIdList ):
     for i in range(N) :
         peerIdList.append(1)
 
+strPeerId = str(peerId)
+logFile = "log%s.txt" % strPeerId
+
+# open file, write and close
+def printOnFile( stringToPrint ):
+    stringToPrint = 'SERVER: %s' % stringToPrint
+    logFileTxT = open(logFile, "a")
+    print >>sys.stderr, 'Log file: ', stringToPrint
+
+    logFileTxT.write(stringToPrint)
+    logFileTxT.close()
+
+    
+# current peer ID
+strlog = 'Inicia server de peerId %s\n' % sys.argv[1]
+print >>sys.stderr, 'Inicia server de peerId %s\n ' % sys.argv[1]
+printOnFile(strlog) 
+
+# number of peers
+strlog = 'Numero de peers %s\n' % sys.argv[2]
+print >>sys.stderr, strlog
+printOnFile(strlog)
+leader = 0
+
 
 #initializing datas
-leader = electFirstLeader()
 port = peerId + 5000
 sock = socket
 sock = initializeSocket( sock )
 peerIdList = []
 initializePeerIdList( peerIdList )
+countConnection = 0
+
+
+#f.write(N)
 
 while True:
 
@@ -55,9 +76,14 @@ while True:
             if dataRcvd:
                 for (key, val) in enumerate(list(dataRcvd)):
                     peerIdList[key] = val
-
+                countConnection += 1
+                if countConnection == N:
+                    leader = electFirstLeader()
+                    
                 peerIdConcate = ''.join(str(e) for e in peerIdList) #concatenate "string" to list which peer is running
-                print >>sys.stderr, 'Enviando peers ativos para o cliente: "%s"' % peerIdConcate   
+                print >>sys.stderr, 'Enviando peers ativos para o cliente: "%s\n"' % peerIdConcate   
+                strlog = 'Enviando peers ativos para o cliente: "%s"\n' % peerIdConcate
+                printOnFile(strlog)
                 connection.sendall(peerIdConcate)                   #send active peers to client
             else:
                 #print >>sys.stderr, '-no data-', client_address
@@ -67,16 +93,24 @@ while True:
             for j in range(N) :
                 if j == peerId:
                     leader = 1
-                    print >>sys.stderr, 'Eu sou o novo lider, meu peer Id eh: %d' % peerId
+                    strlog = 'Eu sou o novo lider, meu peer Id eh: %s\n' % sys.argv[1]
+                    print >>sys.stderr, strlog
+                    printOnFile(strlog)
                     break
                 elif int(peerIdList[j]) == 1:
-                    print 'Nao sou o lider, o lider eh o: %d' % j
+                    strlog = 'O lider e o peerId: %s\n' % str(j)
+                    print >>sys.sterr, strlog
+                    printOnFile(strlog)
+                    
                     # leader is peerIdList[j]
                     break
     except socket.error, exc:
-        print "exception: %s" % exc
+        strlog = "exception: %s\n" % exc
+        print >>sys.stderr, strlog
+        printOnFile(strlog)
 
 
     finally:
         # Clean up the connection
         connection.close()
+        #logFileTxT.close()
